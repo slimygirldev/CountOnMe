@@ -13,30 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet var calculatorView: CalculatorView!
 
     let alertService: AlertProvider = AlertProvider()
-
-    var elements: [String] {
-        // Separation of text into array for exemple :
-        // 1 + 1 = 2
-        // ["1", "+", "1", "=", "2"]
-        return calculatorView.textView.text.split(separator: " ").map { "\($0)" }
-    }
-
-    // Error check computed variables
-    var expressionIsCorrect: Bool {
-        return elements.last != "+" && elements.last != "-"
-    }
-
-    var expressionHaveEnoughElement: Bool {
-        return elements.count >= 3
-    }
-
-    var canAddOperator: Bool {
-        return elements.last != "+" && elements.last != "-"
-    }
-
-    var expressionHaveResult: Bool {
-        return calculatorView.textView.text.firstIndex(of: "=") != nil
-    }
+    var calculModel: CalculModel = CalculModel()
 
     // View Life cycles
     override func viewDidLoad() {
@@ -47,8 +24,9 @@ class ViewController: UIViewController {
 
     // View actions
     func tappedNumberButton(numberBtn: String?) {
+        calculModel.text = calculatorView.textView.text
         if let unwrappedNumberBtn = numberBtn {
-            if expressionHaveResult || calculatorView.textView.text == "0" {
+            if calculModel.expressionHaveResult || calculatorView.textView.text == "0" {
                 calculatorView.textView.text = ""
             }
             calculatorView.textView.text.append(unwrappedNumberBtn)
@@ -56,7 +34,8 @@ class ViewController: UIViewController {
     }
 
     func handleOperation(sign: String) {
-        if canAddOperator {
+        calculModel.text = calculatorView.textView.text
+        if calculModel.canAddOperator {
             calculatorView.textView.text.append(" \(sign) ")
         } else {
             return self.present(alertService.alertError(alertType: .duplicateOperator),
@@ -65,41 +44,17 @@ class ViewController: UIViewController {
     }
 
     func tappedEqualButton() {
-        guard expressionIsCorrect else {
+        calculModel.text = calculatorView.textView.text
+        guard calculModel.expressionIsCorrect else {
             return self.present(alertService.alertError(alertType: .notEnoughElement),
                                 animated: true, completion: nil)
         }
-        guard expressionHaveEnoughElement else {
+        guard calculModel.expressionHaveEnoughElement else {
             return self.present(alertService.alertError(alertType: .uncorrectExpression),
                                 animated: true, completion: nil)
         }
-        // Create local copy of operations
-        var operationsToReduce = elements
-        // Iterate over operations while an operand still here
-        while operationsToReduce.count > 1 {
-            let left = Int(operationsToReduce[0])!
-            let operand = operationsToReduce[1]
-            let right = Int(operationsToReduce[2])!
-            let result: Int
-            switch operand {
-            case "+": result = left + right
-            case "-": result = left - right
-            case "÷":
-                if right == 0 {
-                    return
-                } else {
-                    result = left / right
-                }
-            case "x": result = left * right
-            default:
-                calculatorView.textView.text = ""
-                return self.present(alertService.alertError(alertType: .uncorrectExpression),
-                                  animated: true, completion: nil)
-            }
-            operationsToReduce = Array(operationsToReduce.dropFirst(3))
-            operationsToReduce.insert("\(result)", at: 0)
-        }
-        calculatorView.textView.text.append(" = \(operationsToReduce.first!)")
+        var result = calculModel.equalOperation()
+        calculatorView.textView.text.append(" = \(result)")
     }
 }
 
