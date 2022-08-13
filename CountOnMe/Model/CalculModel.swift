@@ -9,7 +9,10 @@
 import Foundation
 enum CalculationError: Error {
     case divisionByZero
-    case invalideExpression
+    case invalidExpression
+    case notEnoughElement
+    case duplicateOperator
+    case uncorrectExpression
 }
 
 enum Operation: String {
@@ -21,7 +24,7 @@ enum Operation: String {
 }
 
 struct CalculModel {
-// MARK: - Properties
+    // MARK: - Properties
     var text: String = ""
     var oldResult: Int = 0
     var current: Int? = 0
@@ -47,7 +50,14 @@ struct CalculModel {
         let character: Character = Character(Operation.equals.rawValue)
         return text.firstIndex(of: character) != nil
     }
-// MARK: - Methods
+    // MARK: - Methods
+    func canHandleOperation(sign: Operation) throws -> Operation {
+        if expressionIsCorrect == true {
+            return sign
+        } else {
+            throw CalculationError.invalidExpression
+        }
+    }
     func doOperation(left: Int, right: Int, sign: Operation) throws -> Int {
         let result: Int
         switch sign {
@@ -67,17 +77,23 @@ struct CalculModel {
     }
 
     mutating func equalOperation() throws -> String {
+        if expressionIsCorrect != true {
+            throw CalculationError.invalidExpression
+        }
+        if expressionHaveEnoughElement != true {
+            throw CalculationError.notEnoughElement
+        }
         var operationsToReduce = elements
 
         while operationsToReduce.count > 1 {
             guard let left = Int(operationsToReduce[0]) else {
-                return ""
+                throw CalculationError.invalidExpression
             }
             guard let operand = Operation(rawValue: operationsToReduce[1]) else {
-                throw CalculationError.invalideExpression
+                throw CalculationError.invalidExpression
             }
             guard let right = Int(operationsToReduce[2]) else {
-                return ""
+                throw CalculationError.invalidExpression
             }
             do {
                 let result = try doOperation(left: left, right: right, sign: operand)
@@ -87,11 +103,9 @@ struct CalculModel {
             } catch {
                 throw CalculationError.divisionByZero
             }
-
         }
         return operationsToReduce.first!
     }
-
     mutating func allClear() {
         self.text = ""
     }

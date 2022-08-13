@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol CalculatorViewDelegate {
+protocol CalculatorViewDelegate: AnyObject {
     func calculatorViewDelegateTappedAdditionButton()
     func calculatorViewDelegateTappedSubstractionButton()
     func calculatorViewDelegateTappedDivideButton()
@@ -22,10 +22,20 @@ protocol CalculatorViewDelegate {
 class CalculatorView: UIView {
     var delegate: CalculatorViewDelegate?
 
-    @IBOutlet weak var textView: UITextView!
-    @IBOutlet var numberButtons: [UIButton]!
+    @IBOutlet private weak var textView: UITextView!
+    @IBOutlet private var numberButtons: [UIButton]!
 
     // View actions
+    func changeCalculatorText(text: String) {
+        textView.text = text
+    }
+    func appendCalculatortext(textToAppend: String) {
+        textView.text.append(textToAppend)
+    }
+    func getCaclulatorText() -> String {
+        return textView.text
+    }
+
     @IBAction func tappedClearButton(_ sender: UIButton) {
         delegate?.calculatorViewDelegateTappedClearButton()
     }
