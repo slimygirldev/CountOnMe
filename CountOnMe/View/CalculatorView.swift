@@ -16,6 +16,7 @@ protocol CalculatorViewDelegate {
     func calculatorViewDelegateTappedMultiplyButton()
     func calculatorViewDelegateTappedEqualButton()
     func calculatorViewDelegateTappedNumberButton(numberText: String?)
+    func calculatorViewDelegateTappedClearButton()
 }
 
 class CalculatorView: UIView {
@@ -25,6 +26,9 @@ class CalculatorView: UIView {
     @IBOutlet var numberButtons: [UIButton]!
 
     // View actions
+    @IBAction func tappedClearButton(_ sender: UIButton) {
+        delegate?.calculatorViewDelegateTappedClearButton()
+    }
     @IBAction func tappedNumberButton(_ sender: UIButton) {
         delegate?.calculatorViewDelegateTappedNumberButton(numberText: sender.title(for: .normal))
     }
