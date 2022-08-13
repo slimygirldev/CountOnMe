@@ -9,15 +9,9 @@
 import Foundation
 import UIKit
 
-class AlertProvider {
+class AlertProvider: Error {
 
-    enum AlertType {
-        case duplicateOperator
-        case uncorrectExpression
-        case notEnoughElement
-    }
-
-    func alertError(alertType: AlertType) -> UIAlertController {
+    func alertError(alertType: CalculationError) -> UIAlertController {
         switch alertType {
         case .duplicateOperator:
             let alertVC = UIAlertController(title: "Zéro!",
@@ -31,7 +25,18 @@ class AlertProvider {
             return alertVC
         case .notEnoughElement:
             let alertVC = UIAlertController(title: "Zéro!",
-                                            message: "Démarrez un nouveau calcul !", preferredStyle: .alert)
+                                            message: "Il n'y a pas assez d'éléments pour faire le calcul.",
+                                            preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            return alertVC
+        case .invalidExpression:
+            let alertVC = UIAlertController(title: "Zéro!",
+                                            message: "L'expression est incorrecte", preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            return alertVC
+        case .divisionByZero:
+            let alertVC = UIAlertController(title: "Zéro!",
+                                            message: "Division par zéro impossible.", preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             return alertVC
         }

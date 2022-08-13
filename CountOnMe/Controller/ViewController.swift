@@ -22,51 +22,51 @@ class ViewController: UIViewController {
     }
 
     func tappedNumberButton(numberBtn: String?) {
-        calculModel.text = calculatorView.textView.text
+        calculModel.text = calculatorView.getCaclulatorText()
         if let unwrappedNumberBtn = numberBtn {
-            if calculModel.expressionHaveResult || calculatorView.textView.text == "0" {
-                calculatorView.textView.text = ""
+            if calculModel.expressionHaveResult || calculatorView.getCaclulatorText() == "0" {
+                calculatorView.changeCalculatorText(text: "")
             }
-            calculatorView.textView.text.append(unwrappedNumberBtn)
+            calculatorView.appendCalculatortext(textToAppend: unwrappedNumberBtn)
         }
     }
 
-    func handleOperation(sign: String) {
-        calculModel.text = calculatorView.textView.text
-        let canDoOperation = calculModel.expressionIsCorrect
-        if canDoOperation {
-            calculatorView.textView.text.append(" \(sign) ")
-        } else {
-            return self.present(alertService.alertError(alertType: .duplicateOperator),
-                                animated: true, completion: nil)
+    func handleOperation(sign: Operation) {
+        calculModel.text = calculatorView.getCaclulatorText()
+        do {
+            let operatorSign = try calculModel.canHandleOperation(sign: sign)
+            calculatorView.appendCalculatortext(textToAppend: " \(operatorSign) ")
+        } catch CalculationError.invalidExpression {
+            self.present(alertService.alertError(alertType: .duplicateOperator),
+                         animated: true, completion: nil)
+        } catch {
+            print("Unexpected error: \(error).")
         }
     }
 
     func tappedClearButton() {
         calculModel.allClear()
-        calculatorView.textView.text = ""
+        calculatorView.changeCalculatorText(text: "")
     }
 
     func tappedEqualButton() {
-        calculModel.text = calculatorView.textView.text
-        guard calculModel.expressionIsCorrect else {
-            return self.present(alertService.alertError(alertType: .notEnoughElement),
-                                animated: true, completion: nil)
-        }
-        guard calculModel.expressionHaveEnoughElement else {
-            return self.present(alertService.alertError(alertType: .uncorrectExpression),
-                                animated: true, completion: nil)
-        }
-        // Risque de crash  - a mettre dans un try catch
+        calculModel.text = calculatorView.getCaclulatorText()
         do {
             let result = try calculModel.equalOperation()
-            calculatorView.textView.text = result
-        } catch CalculationError.invalideExpression {
-            self.present(alertService.alertError(alertType: .uncorrectExpression),
-                                animated: true, completion: nil)
-            print("Error alert calculation by 0")
+            calculatorView.changeCalculatorText(text: result)
+        } catch CalculationError.invalidExpression {
+            self.present(alertService.alertError(alertType: .invalidExpression),
+                         animated: true, completion: nil)
+            print("Error invalid expression")
         } catch CalculationError.divisionByZero {
-
+            self.present(alertService.alertError(alertType: .divisionByZero),
+                         animated: true, completion: nil)
+            tappedClearButton()
+            print("Error alert calculation by 0")
+        } catch CalculationError.notEnoughElement {
+            self.present(alertService.alertError(alertType: .notEnoughElement),
+                         animated: true, completion: nil)
+            print("Error not enough elements")
         } catch {
             print("Unexpected error: \(error).")
         }
@@ -79,11 +79,11 @@ extension ViewController: CalculatorViewDelegate {
     }
 
     func calculatorViewDelegateTappedDivideButton() {
-        handleOperation(sign: Operation.divide.rawValue)
+        handleOperation(sign: Operation.divide)
     }
 
     func calculatorViewDelegateTappedMultiplyButton() {
-        handleOperation(sign: Operation.multiply.rawValue)
+        handleOperation(sign: Operation.multiply)
     }
 
     func calculatorViewDelegateTappedNumberButton(numberText: String?) {
@@ -91,11 +91,11 @@ extension ViewController: CalculatorViewDelegate {
     }
 
     func calculatorViewDelegateTappedAdditionButton() {
-        handleOperation(sign: Operation.add.rawValue)
+        handleOperation(sign: Operation.add)
     }
 
     func calculatorViewDelegateTappedSubstractionButton() {
-        handleOperation(sign: Operation.substract.rawValue)
+        handleOperation(sign: Operation.substract)
     }
 
     func calculatorViewDelegateTappedEqualButton() {
