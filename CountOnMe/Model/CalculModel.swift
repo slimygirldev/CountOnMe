@@ -25,10 +25,9 @@ enum Operation: String {
 
 struct CalculModel {
     // MARK: - Properties
-    var text: String = ""
-    var oldResult: Int = 0
-    var current: Int? = 0
-    var asAnOperation: Bool = false
+    private var text: String = ""
+    private var current: Int?
+    private var asAnOperation: Bool = false
 
     var elements: [String] {
         return text.split(separator: " ").map { "\($0)" }
@@ -51,7 +50,28 @@ struct CalculModel {
         return text.firstIndex(of: character) != nil
     }
     // MARK: - Methods
-    func canHandleOperation(sign: Operation) throws -> Operation {
+    mutating func setCalculationText(_ text: String) {
+        self.text = text
+    }
+    func canExpressionHaveResult() -> Bool {
+        if expressionHaveResult || text == "0" {
+            return true
+        }
+        return false
+    }
+
+    mutating func isCurrentNil() -> Bool {
+        if current == nil {
+            return true
+        } else {
+            return false
+        }
+    }
+    mutating func resetCurrent() {
+        current = nil
+    }
+    mutating func canHandleOperation(sign: Operation) throws -> Operation {
+        current = nil
         if expressionIsCorrect == true {
             return sign
         } else {

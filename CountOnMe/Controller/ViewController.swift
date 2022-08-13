@@ -22,9 +22,13 @@ class ViewController: UIViewController {
     }
 
     func tappedNumberButton(numberBtn: String?) {
-        calculModel.text = calculatorView.getCaclulatorText()
+        calculModel.setCalculationText(calculatorView.getCaclulatorText())
         if let unwrappedNumberBtn = numberBtn {
-            if calculModel.expressionHaveResult || calculatorView.getCaclulatorText() == "0" {
+            if calculModel.isCurrentNil() == false {
+                calculatorView.changeCalculatorText(text: "")
+                calculModel.resetCurrent()
+            }
+            if calculModel.canExpressionHaveResult() {
                 calculatorView.changeCalculatorText(text: "")
             }
             calculatorView.appendCalculatortext(textToAppend: unwrappedNumberBtn)
@@ -32,10 +36,10 @@ class ViewController: UIViewController {
     }
 
     func handleOperation(sign: Operation) {
-        calculModel.text = calculatorView.getCaclulatorText()
+        calculModel.setCalculationText(calculatorView.getCaclulatorText())
         do {
             let operatorSign = try calculModel.canHandleOperation(sign: sign)
-            calculatorView.appendCalculatortext(textToAppend: " \(operatorSign) ")
+            calculatorView.appendCalculatortext(textToAppend: " \(operatorSign.rawValue) ")
         } catch CalculationError.invalidExpression {
             self.present(alertService.alertError(alertType: .duplicateOperator),
                          animated: true, completion: nil)
@@ -50,7 +54,7 @@ class ViewController: UIViewController {
     }
 
     func tappedEqualButton() {
-        calculModel.text = calculatorView.getCaclulatorText()
+        calculModel.setCalculationText(calculatorView.getCaclulatorText())
         do {
             let result = try calculModel.equalOperation()
             calculatorView.changeCalculatorText(text: result)
