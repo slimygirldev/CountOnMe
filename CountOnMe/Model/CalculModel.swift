@@ -78,6 +78,14 @@ struct CalculModel {
             throw CalculationError.invalidExpression
         }
     }
+    func findPriorityIndex(array: [String]) -> Int {
+        // multiply
+        if let index = array.firstIndex(of: Operation.multiply.rawValue) {
+            return index
+        }
+        return -1
+    }
+
     func doOperation(left: Int, right: Int, sign: Operation) throws -> Int {
         let result: Int
         switch sign {
@@ -95,6 +103,24 @@ struct CalculModel {
         }
         return result
     }
+    mutating func prepareOperation(toReduce: [String], index: Int) throws -> Int {
+        guard let left = Int(toReduce[index - 1]) else {
+            throw CalculationError.invalidExpression
+        }
+        guard let operand = Operation(rawValue: toReduce[index]) else {
+            throw CalculationError.invalidExpression
+        }
+        guard let right = Int(toReduce[index + 1]) else {
+            throw CalculationError.invalidExpression
+        }
+        do {
+            let result = try doOperation(left: left, right: right, sign: operand)
+            current = result
+            return result
+        } catch {
+            throw CalculationError.divisionByZero
+        }
+    }
 
     mutating func equalOperation() throws -> String {
         if expressionIsCorrect != true {
@@ -106,22 +132,26 @@ struct CalculModel {
         var operationsToReduce = elements
 
         while operationsToReduce.count > 1 {
-            guard let left = Int(operationsToReduce[0]) else {
-                throw CalculationError.invalidExpression
-            }
-            guard let operand = Operation(rawValue: operationsToReduce[1]) else {
-                throw CalculationError.invalidExpression
-            }
-            guard let right = Int(operationsToReduce[2]) else {
-                throw CalculationError.invalidExpression
-            }
-            do {
-                let result = try doOperation(left: left, right: right, sign: operand)
-                current = result
-                operationsToReduce = Array(operationsToReduce.dropFirst(3))
-                operationsToReduce.insert("\(result)", at: 0)
-            } catch {
-                throw CalculationError.divisionByZero
+            // checking if there is a multiply priority in calculation
+            let index = findPriorityIndex(array: operationsToReduce)
+            if index != -1 {
+                do {
+                    let result = try prepareOperation(toReduce: operationsToReduce, index: index)
+                    operationsToReduce.remove(at: index + 1)
+                    operationsToReduce.remove(at: index)
+                    operationsToReduce.remove(at: index - 1)
+                    operationsToReduce.insert("\(result)", at: index - 1)
+                } catch {
+                    throw CalculationError.divisionByZero
+                }
+            } else {
+                do {
+                    let result = try prepareOperation(toReduce: operationsToReduce, index: 1)
+                    operationsToReduce = Array(operationsToReduce.dropFirst(3))
+                    operationsToReduce.insert("\(result)", at: 0)
+                } catch {
+                    throw CalculationError.divisionByZero
+                }
             }
         }
         return operationsToReduce.first!
