@@ -140,6 +140,10 @@ struct CalculModel {
                     operationsToReduce.remove(at: index + 1)
                     operationsToReduce.remove(at: index)
                     operationsToReduce.remove(at: index - 1)
+                    // pour gérer les cas où la prio est au milieu d'un calcul
+                    // pour eviter le shift de placement dans l'array, supp par la fin
+                    // et on place le resulat à la place avant la position de l'operator (index)
+                    // pour s'assurer qu'il est bien 
                     operationsToReduce.insert("\(result)", at: index - 1)
                 } catch {
                     throw CalculationError.divisionByZero
