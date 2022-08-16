@@ -82,6 +82,8 @@ struct CalculModel {
         // multiply
         if let index = array.firstIndex(of: Operation.multiply.rawValue) {
             return index
+        } else if let index = array.firstIndex(of: Operation.divide.rawValue) {
+            return index
         }
         return -1
     }
