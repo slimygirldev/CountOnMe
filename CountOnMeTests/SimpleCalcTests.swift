@@ -10,5 +10,12 @@ import XCTest
 @testable import CountOnMe
 
 class SimpleCalcTests: XCTestCase {
-    
+    var model: CalculModel = CalculModel()
+
+    func testAddition() {
+        model.setCalculationText("1 + 1")
+        let result = try? model.equalOperation()
+
+        XCTAssertTrue(result == "2")
+    }
 }
