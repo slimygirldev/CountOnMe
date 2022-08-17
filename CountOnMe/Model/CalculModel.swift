@@ -29,11 +29,11 @@ struct CalculModel {
     private var current: Int?
     private var asAnOperation: Bool = false
 
-    var elements: [String] {
+    private var elements: [String] {
         return text.split(separator: " ").map { "\($0)" }
     }
 
-    var expressionIsCorrect: Bool {
+    private var expressionIsCorrect: Bool {
         // empêcher de pouvoir entrer deux operator à la suite
         return elements.last != Operation.add.rawValue
         && elements.last != Operation.substract.rawValue
@@ -41,11 +41,11 @@ struct CalculModel {
         && elements.last != Operation.multiply.rawValue
     }
 
-    var expressionHaveEnoughElement: Bool {
+    private var expressionHaveEnoughElement: Bool {
         return elements.count >= 3
     }
 
-    var expressionHaveResult: Bool {
+    private var expressionHaveResult: Bool {
         let character: Character = Character(Operation.equals.rawValue)
         return text.firstIndex(of: character) != nil
     }
@@ -53,13 +53,14 @@ struct CalculModel {
     mutating func setCalculationText(_ text: String) {
         self.text = text
     }
+    // check if the user choices can end up to a calculation result
     func canExpressionHaveResult() -> Bool {
         if expressionHaveResult || text == "0" {
             return true
         }
         return false
     }
-
+    // checking if current has a value
     mutating func isCurrentNil() -> Bool {
         if current == nil {
             return true
@@ -67,9 +68,23 @@ struct CalculModel {
             return false
         }
     }
+    mutating func shouldResetView() -> Bool {
+        // nettoyer current
+        if isCurrentNil() == false {
+            resetCurrent()
+            return true
+        }
+        // nettoyer le text
+        if canExpressionHaveResult() {
+            return true
+        }
+        return false
+    }
+    // reset current value to nil
     mutating func resetCurrent() {
         current = nil
     }
+    // checking if user entry can lead to a valid operation
     mutating func canHandleOperation(sign: Operation) throws -> Operation {
         current = nil
         if expressionIsCorrect == true {
@@ -78,8 +93,8 @@ struct CalculModel {
             throw CalculationError.invalidExpression
         }
     }
-    func findPriorityIndex(array: [String]) -> Int {
-        // multiply
+    // checking for priority calculation in expression
+    private func findPriorityIndex(array: [String]) -> Int {
         if let index = array.firstIndex(of: Operation.multiply.rawValue) {
             return index
         } else if let index = array.firstIndex(of: Operation.divide.rawValue) {
@@ -87,25 +102,8 @@ struct CalculModel {
         }
         return -1
     }
-
-    func doOperation(left: Int, right: Int, sign: Operation) throws -> Int {
-        let result: Int
-        switch sign {
-        case .add: result = left + right
-        case .substract: result = left - right
-        case .divide:
-            if right == 0 {
-                throw CalculationError.divisionByZero
-            } else {
-                result = left / right
-            }
-        case .multiply: result = left * right
-        default:
-            return 0
-        }
-        return result
-    }
-    mutating func prepareOperation(toReduce: [String], index: Int) throws -> Int {
+    // use the index value of findPriorityIndex
+    mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Int {
         guard let left = Int(toReduce[index - 1]) else {
             throw CalculationError.invalidExpression
         }
@@ -123,16 +121,34 @@ struct CalculModel {
             throw CalculationError.divisionByZero
         }
     }
-
+    // calculation logic
+    private func doOperation(left: Int, right: Int, sign: Operation) throws -> Int {
+        let result: Int
+        switch sign {
+        case .add: result = left + right
+        case .substract: result = left - right
+        case .divide:
+            if right == 0 {
+                throw CalculationError.divisionByZero
+            } else {
+                result = left / right
+            }
+        case .multiply: result = left * right
+        default:
+            return 0
+        }
+        return result
+    }
     mutating func equalOperation() throws -> String {
+        // checking errors of user entry
         if expressionIsCorrect != true {
             throw CalculationError.invalidExpression
         }
         if expressionHaveEnoughElement != true {
             throw CalculationError.notEnoughElement
         }
-        var operationsToReduce = elements
 
+        var operationsToReduce = elements
         while operationsToReduce.count > 1 {
             // checking if there is a multiply priority in calculation
             let index = findPriorityIndex(array: operationsToReduce)
@@ -145,7 +161,6 @@ struct CalculModel {
                     // pour gérer les cas où la prio est au milieu d'un calcul
                     // pour eviter le shift de placement dans l'array, supp par la fin
                     // et on place le resulat à la place avant la position de l'operator (index)
-                    // pour s'assurer qu'il est bien 
                     operationsToReduce.insert("\(result)", at: index - 1)
                 } catch {
                     throw CalculationError.divisionByZero

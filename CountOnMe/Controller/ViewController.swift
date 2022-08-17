@@ -24,11 +24,7 @@ class ViewController: UIViewController {
     func tappedNumberButton(numberBtn: String?) {
         calculModel.setCalculationText(calculatorView.getCaclulatorText())
         if let unwrappedNumberBtn = numberBtn {
-            if calculModel.isCurrentNil() == false {
-                calculatorView.changeCalculatorText(text: "")
-                calculModel.resetCurrent()
-            }
-            if calculModel.canExpressionHaveResult() {
+            if calculModel.shouldResetView() == true {
                 calculatorView.changeCalculatorText(text: "")
             }
             calculatorView.appendCalculatortext(textToAppend: unwrappedNumberBtn)
