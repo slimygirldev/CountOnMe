@@ -26,7 +26,7 @@ enum Operation: String {
 struct CalculModel {
     // MARK: - Properties
     private var text: String = ""
-    private var current: Int?
+    private var current: Double?
     private var asAnOperation: Bool = false
 
     private var elements: [String] {
@@ -102,15 +102,24 @@ struct CalculModel {
         }
         return -1
     }
+    func isInteger(_ result: Double) -> Bool {
+        // permet de voir si il y a des chiffres après la virgule (decimal)
+        if result.truncatingRemainder(dividingBy: 1) == 0 {
+            return true
+        } else {
+            return false
+        }
+    }
+
     // use the index value of findPriorityIndex
-    mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Int {
-        guard let left = Int(toReduce[index - 1]) else {
+    mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Double {
+        guard let left = Double(toReduce[index - 1]) else {
             throw CalculationError.invalidExpression
         }
         guard let operand = Operation(rawValue: toReduce[index]) else {
             throw CalculationError.invalidExpression
         }
-        guard let right = Int(toReduce[index + 1]) else {
+        guard let right = Double(toReduce[index + 1]) else {
             throw CalculationError.invalidExpression
         }
         do {
@@ -122,8 +131,8 @@ struct CalculModel {
         }
     }
     // calculation logic
-    private func doOperation(left: Int, right: Int, sign: Operation) throws -> Int {
-        let result: Int
+    private func doOperation(left: Double, right: Double, sign: Operation) throws -> Double {
+        let result: Double
         switch sign {
         case .add: result = left + right
         case .substract: result = left - right
@@ -138,6 +147,24 @@ struct CalculModel {
             return 0
         }
         return result
+    }
+    func transformDoubleResultIntoInteger(_ finalResult: String?) throws -> String {
+        // unwrapping operationToReduce.firts qui est optionnel
+        // puis unwrappe result qui est un Double optionnel
+        // c'est une succession de if let en condensé, plus facile à lire
+        if let finalResult = finalResult,
+           let result: Double = Double(finalResult) {
+            if isInteger(result) {
+                // transformation du resultat double (ex: 3.0) en entier (3)
+                let intergerResult: Int = Int(result)
+                // transforme notre resultat Int en String en l'inbriquant dans un string
+                return "\(intergerResult)"
+            } else {
+                // resultat avec un decimal valide (ex : 3.5)
+                return finalResult
+            }
+        }
+        throw CalculationError.invalidExpression
     }
     mutating func equalOperation() throws -> String {
         // checking errors of user entry
@@ -175,7 +202,12 @@ struct CalculModel {
                 }
             }
         }
-        return operationsToReduce.first!
+        do {
+            let finalResult = try transformDoubleResultIntoInteger(operationsToReduce.first)
+            return finalResult
+        } catch {
+            throw CalculationError.invalidExpression
+        }
     }
     mutating func allClear() {
         self.text = ""
