@@ -44,6 +44,7 @@ class SimpleCalcTests: XCTestCase {
     // MARK: - Substraction
     func testGivenCalculation_WhenSubstraction_ThenSuccessSubstraction() {
         model.setCalculationText("1 \(Operation.substract.rawValue) 1")
+
         let result = try? model.equalOperation()
 
         XCTAssertTrue(result == "0")
@@ -51,6 +52,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculation_WhenSubstraction_ThenFailSubstraction() {
         model.setCalculationText("1 \(Operation.substract.rawValue) 1")
+
         let result = try? model.equalOperation()
 
         XCTAssertFalse(result == "2")
@@ -58,6 +60,7 @@ class SimpleCalcTests: XCTestCase {
     // MARK: - Multiply
     func testGivenCalculation_WhenMultiply_ThenSuccessMultiply() {
         model.setCalculationText("1 \(Operation.multiply.rawValue) 2")
+
         let result = try? model.equalOperation()
 
         XCTAssertTrue(result == "2")
@@ -65,6 +68,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculation_WhenMultiply_ThenFailMultiply() {
         model.setCalculationText("1 \(Operation.multiply.rawValue) 2")
+
         let result = try? model.equalOperation()
 
         XCTAssertFalse(result == "3")
@@ -72,6 +76,7 @@ class SimpleCalcTests: XCTestCase {
     // MARK: - Division
     func testGivenCalculation_WhenDivide_ThenSuccessDivide() {
         model.setCalculationText("2 \(Operation.divide.rawValue) 2")
+
         let result = try? model.equalOperation()
 
         XCTAssertTrue(result == "1")
@@ -79,6 +84,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculation_WhenDivide_ThenFailDivide() {
         model.setCalculationText("2 \(Operation.divide.rawValue) 2")
+
         let result = try? model.equalOperation()
 
         XCTAssertFalse(result == "0")
@@ -86,6 +92,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculationWithDouble_WhenDivide_ThenSuccesDivide() {
         model.setCalculationText("3 \(Operation.divide.rawValue) 2")
+
         let result = try? model.equalOperation()
 
         XCTAssertTrue(result == "1.5")
@@ -93,6 +100,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculation_WhenDivideByZero_ThenCatchFailDivide() {
         model.setCalculationText("2 \(Operation.divide.rawValue) 0")
+
         model.setCalculationText("0 \(Operation.divide.rawValue) 0")
         //        do {
         //            _ = try model.equalOperation()
@@ -105,63 +113,103 @@ class SimpleCalcTests: XCTestCase {
             XCTAssertEqual(error as? CalculationError, CalculationError.divisionByZero)
         }
     }
+    // MARK: - Priority
+    func testGivenCalculationWithPriority_WhenDoOperationFindPriority_ThenSuccessCalculation() {
+        model.setCalculationText(
+            "3 \(Operation.add.rawValue) 2 \(Operation.multiply.rawValue) 2 \(Operation.divide.rawValue) 2")
+
+        let result = try? model.equalOperation()
+
+        XCTAssertTrue(result == "5")
+    }
+
+    func testGivenCalculationWithError_WhenDoOperationFindPriority_ThenCatchInvalideExpression() {
+        model.setCalculationText("2 \(Operation.multiply.rawValue) 3 3 \(Operation.substract.rawValue) 2")
+
+        XCTAssertThrowsError(try model.equalOperation()) { error in
+            XCTAssertEqual(error as? CalculationError, CalculationError.divisionByZero)
+        }
+    }
+
     // MARK: - Logic
+    func testGivenOperationToPrepare_WhenUnwrappingElements_ThenSuccessCalculationElementsPrepare() {
+        let operation =  ["1", "+", "4"]
+
+        let left = try? model.createDoubleElementForOperation(array: operation, index: 0)
+        let operationElement = try? model.createOperatorElementForOperation(array: operation, index: 1)
+        let right = try? model.createDoubleElementForOperation(array: operation, index: 2)
+
+        XCTAssert(operationElement == Operation.add)
+        XCTAssert(left == 1)
+        XCTAssert(right == 4)
+    }
+
+    func testGivenUnvalideOperatorForCalculation_WhenTryCreateOperatorElement_ThenCatchErrorInvalideExpression() {
+        XCTAssertThrowsError(try model.createOperatorElementForOperation(array: ["1"], index: 0)) { error in
+            XCTAssertEqual(error as? CalculationError, CalculationError.invalidExpression)
+        }
+    }
+
+    func testGivenUnvalideOperandsForCalculation_WhenTryCreateOperandElements_ThenCatchErrorInvalideExpression() {
+        XCTAssertThrowsError(try model.createDoubleElementForOperation(array: ["e"], index: 0)) { error in
+            XCTAssertEqual(error as? CalculationError, CalculationError.invalidExpression)
+        }
+    }
+
     func testGivenCalculation_WhenSetCalculationTextIsZero_ThenSuccessResetView() {
-        // Given
         model.setCalculationText("0")
 
-        // When
         let reset = model.shouldResetView()
 
-        // Then
         XCTAssert(reset == true)
     }
 
     func testGivenCalculation_WhenSetCalculationTextIsEqual_ThenSuccessResetView() {
-        // Given
         model.setCalculationText("=")
 
-        // When
         let reset = model.shouldResetView()
 
-        // Then
         XCTAssert(reset == true)
     }
 
     func testGivenCalculation_WhenIsCurrentNotNil_ThenSuccessResetView() {
-        // Given
         model.setCalculationText("1 \(Operation.add.rawValue) 1")
         _ = try? model.equalOperation()
 
-        // When
         let reset = model.shouldResetView()
 
-        // Then
         XCTAssert(reset == true)
     }
 
     func testGivenSetCalculationText_WhenCanHandleOperationIsTrue_ThenExpressionIsCorrect() {
-        // Given
         model.setCalculationText("1")
-        // When
+
         let operation = try?  model.canHandleOperation(sign: .add)
-        // Then
+
         XCTAssert(operation == .add)
     }
 
     func testGivenExpressionIsNotCorrect_WhenExpressionIsFalse_ThenCatchFailCanHandleOperation() {
         model.setCalculationText("+")
+
         XCTAssertThrowsError(try model.canHandleOperation(sign: .divide)) { error in
             XCTAssertEqual(error as? CalculationError, CalculationError.invalidExpression)
         }
     }
 
     func testGivenCalculationTextIsFilled_WhenAllClearUsed_ThenCalculationTextIsCleared() {
-        // Given
         model.setCalculationText("1")
-        // When
+
         model.allClear()
-        // Then
+
         XCTAssert(model.text == "")
+    }
+
+    func testGivenCalculation_WhenExpressionHaveResultReturnFalse_ThenCanExpressionHaveResultReturnFalse() {
+        model.setCalculationText("1")
+
+        let result = model.canExpressionHaveResult()
+
+        XCTAssert(result == false)
     }
 }

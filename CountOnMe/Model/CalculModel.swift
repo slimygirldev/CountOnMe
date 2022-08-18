@@ -55,7 +55,7 @@ struct CalculModel {
         self.text = text
     }
     // check if the user choices can end up to a calculation result
-    private func canExpressionHaveResult() -> Bool {
+    func canExpressionHaveResult() -> Bool {
         if expressionHaveResult || text == "0" {
             return true
         }
@@ -111,20 +111,30 @@ struct CalculModel {
             return false
         }
     }
+    // separation des
+    func createDoubleElementForOperation(array: [String], index: Int) throws -> Double {
+        guard let element = Double(array[index]) else {
+            throw CalculationError.invalidExpression
+        }
+        return element
+    }
+    func createOperatorElementForOperation(array: [String], index: Int) throws -> Operation {
+        guard let operatorElement = Operation(rawValue: array[index]) else {
+            throw CalculationError.invalidExpression
+        }
+        return operatorElement
+    }
 
-    // use the index value of findPriorityIndex
+    // method who prepare operation
     mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Double {
-        guard let left = Double(toReduce[index - 1]) else {
-            throw CalculationError.invalidExpression
-        }
-        guard let operand = Operation(rawValue: toReduce[index]) else {
-            throw CalculationError.invalidExpression
-        }
-        guard let right = Double(toReduce[index + 1]) else {
-            throw CalculationError.invalidExpression
-        }
         do {
-            let result = try doOperation(left: left, right: right, sign: operand)
+            let left = try createDoubleElementForOperation(array: toReduce, index: index - 1)
+            let operand = try createOperatorElementForOperation(array: toReduce, index: index)
+            let right = try createDoubleElementForOperation(array: toReduce, index: index + 1)
+
+            let result = try doOperation(left: left,
+                                         right: right,
+                                         sign: operand)
             current = result
             return result
         } catch {
@@ -149,6 +159,7 @@ struct CalculModel {
         }
         return result
     }
+
     private func transformDoubleResultIntoInteger(_ finalResult: String?) throws -> String {
         // unwrapping operationToReduce.firts qui est optionnel
         // puis unwrappe result qui est un Double optionnel
