@@ -25,7 +25,7 @@ enum Operation: String {
 
 struct CalculModel {
     // MARK: - Properties
-    private var text: String = ""
+    private(set) var text: String = ""
     private var current: Double?
     private var asAnOperation: Bool = false
 
@@ -46,6 +46,7 @@ struct CalculModel {
     }
 
     private var expressionHaveResult: Bool {
+        // cree character "="
         let character: Character = Character(Operation.equals.rawValue)
         return text.firstIndex(of: character) != nil
     }
@@ -54,14 +55,14 @@ struct CalculModel {
         self.text = text
     }
     // check if the user choices can end up to a calculation result
-    func canExpressionHaveResult() -> Bool {
+    private func canExpressionHaveResult() -> Bool {
         if expressionHaveResult || text == "0" {
             return true
         }
         return false
     }
     // checking if current has a value
-    mutating func isCurrentNil() -> Bool {
+    mutating private func isCurrentNil() -> Bool {
         if current == nil {
             return true
         } else {
@@ -81,7 +82,7 @@ struct CalculModel {
         return false
     }
     // reset current value to nil
-    mutating func resetCurrent() {
+    mutating private func resetCurrent() {
         current = nil
     }
     // checking if user entry can lead to a valid operation
@@ -102,7 +103,7 @@ struct CalculModel {
         }
         return -1
     }
-    func isInteger(_ result: Double) -> Bool {
+    private func isInteger(_ result: Double) -> Bool {
         // permet de voir si il y a des chiffres après la virgule (decimal)
         if result.truncatingRemainder(dividingBy: 1) == 0 {
             return true
@@ -148,7 +149,7 @@ struct CalculModel {
         }
         return result
     }
-    func transformDoubleResultIntoInteger(_ finalResult: String?) throws -> String {
+    private func transformDoubleResultIntoInteger(_ finalResult: String?) throws -> String {
         // unwrapping operationToReduce.firts qui est optionnel
         // puis unwrappe result qui est un Double optionnel
         // c'est une succession de if let en condensé, plus facile à lire

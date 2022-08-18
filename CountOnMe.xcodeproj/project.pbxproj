@@ -17,6 +17,7 @@
 		98018ED22899BA16008F6E65 /* CalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98018ED12899BA16008F6E65 /* CalculatorView.swift */; };
 		98018ED52899BFE5008F6E65 /* AlertProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98018ED42899BFE5008F6E65 /* AlertProvider.swift */; };
 		98018F15289BF18F008F6E65 /* CalculModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98018F14289BF18F008F6E65 /* CalculModel.swift */; };
+		986DEEAA28AD0A6500F8B952 /* AlertProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986DEEA928AD0A6500F8B952 /* AlertProviderTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		98018ED12899BA16008F6E65 /* CalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorView.swift; sourceTree = "<group>"; };
 		98018ED42899BFE5008F6E65 /* AlertProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertProvider.swift; sourceTree = "<group>"; };
 		98018F14289BF18F008F6E65 /* CalculModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculModel.swift; sourceTree = "<group>"; };
+		986DEEA928AD0A6500F8B952 /* AlertProviderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertProviderTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 			children = (
 				1FA43BE7224E569A00F565CB /* SimpleCalcTests.swift */,
 				1FA43BE9224E569A00F565CB /* Info.plist */,
+				986DEEA928AD0A6500F8B952 /* AlertProviderTest.swift */,
 			);
 			path = CountOnMeTests;
 			sourceTree = "<group>";
@@ -339,6 +342,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FA43BE8224E569A00F565CB /* SimpleCalcTests.swift in Sources */,
+				986DEEAA28AD0A6500F8B952 /* AlertProviderTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +547,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GB34966X5M;
 				INFOPLIST_FILE = CountOnMeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -563,6 +568,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = GB34966X5M;
 				INFOPLIST_FILE = CountOnMeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
