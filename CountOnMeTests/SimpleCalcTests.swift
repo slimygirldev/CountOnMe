@@ -102,13 +102,7 @@ class SimpleCalcTests: XCTestCase {
         model.setCalculationText("2 \(Operation.divide.rawValue) 0")
 
         model.setCalculationText("0 \(Operation.divide.rawValue) 0")
-        //        do {
-        //            _ = try model.equalOperation()
-        //        } catch CalculationError.divisionByZero {
-        //            XCTAssert(true)
-        //        } catch {
-        //            XCTAssert(false)
-        //        }
+
         XCTAssertThrowsError(try model.equalOperation()) { error in
             XCTAssertEqual(error as? CalculationError, CalculationError.divisionByZero)
         }

@@ -160,7 +160,7 @@ struct CalculModel {
         return result
     }
 
-    private func transformDoubleResultIntoInteger(_ finalResult: String?) throws -> String {
+    private func transformDoubleResultIntoInteger(_ finalResult: String?) -> String {
         // unwrapping operationToReduce.firts qui est optionnel
         // puis unwrappe result qui est un Double optionnel
         // c'est une succession de if let en condensé, plus facile à lire
@@ -176,7 +176,7 @@ struct CalculModel {
                 return finalResult
             }
         }
-        throw CalculationError.invalidExpression
+        return ""
     }
     mutating func equalOperation() throws -> String {
         // checking errors of user entry
@@ -214,12 +214,8 @@ struct CalculModel {
                 }
             }
         }
-        do {
-            let finalResult = try transformDoubleResultIntoInteger(operationsToReduce.first)
-            return finalResult
-        } catch {
-            throw CalculationError.invalidExpression
-        }
+        let finalResult = transformDoubleResultIntoInteger(operationsToReduce.first)
+        return finalResult
     }
     mutating func allClear() {
         self.text = ""
