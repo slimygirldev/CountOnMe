@@ -168,9 +168,8 @@ struct CalculModel {
            let result: Double = Double(finalResult) {
             if isInteger(result) {
                 // transformation du resultat double (ex: 3.0) en entier (3)
-                let intergerResult: Int = Int(result)
                 // transforme notre resultat Int en String en l'inbriquant dans un string
-                return "\(intergerResult)"
+                return String(format: "%.0f", result)
             } else {
                 // resultat avec un decimal valide (ex : 3.5)
                 return finalResult

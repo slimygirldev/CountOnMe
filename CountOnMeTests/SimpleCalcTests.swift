@@ -117,6 +117,15 @@ class SimpleCalcTests: XCTestCase {
         XCTAssertTrue(result == "5")
     }
 
+    func testGivenCalculationWithBigNumbers_WhenDoOperationFindPriorityAndHandleBigNumbers_ThenSuccessCalculation() {
+        model.setCalculationText(
+            "999554 \(Operation.add.rawValue) 9956 \(Operation.multiply.rawValue) 2244")
+
+        let result = try? model.equalOperation()
+
+        XCTAssertTrue(result == "23340818")
+    }
+
     func testGivenCalculationWithError_WhenDoOperationFindPriority_ThenCatchInvalideExpression() {
         model.setCalculationText("2 \(Operation.multiply.rawValue) 3 3 \(Operation.substract.rawValue) 2")
 
