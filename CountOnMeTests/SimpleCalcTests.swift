@@ -15,6 +15,7 @@ class SimpleCalcTests: XCTestCase {
     // MARK: - Addition
     func testGivenCalculation_WhenAddition_ThenSuccessAddition() {
         model.setCalculationText("1 \(Operation.add.rawValue) 1")
+
         let result = try? model.equalOperation()
 
         XCTAssertTrue(result == "2")
@@ -22,6 +23,7 @@ class SimpleCalcTests: XCTestCase {
 
     func testGivenCalculation_WhenAddition_ThenFailAddition() {
         model.setCalculationText("1 \(Operation.add.rawValue) 1")
+
         let result = try? model.equalOperation()
 
         XCTAssertFalse(result == "3")
