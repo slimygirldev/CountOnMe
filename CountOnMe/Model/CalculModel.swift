@@ -34,7 +34,7 @@ struct CalculModel {
     }
 
     private var expressionIsCorrect: Bool {
-        // empêcher de pouvoir entrer deux operator à la suite
+        // prevent to enter two operator consecutively
         return elements.last != Operation.add.rawValue
         && elements.last != Operation.substract.rawValue
         && elements.last != Operation.divide.rawValue
@@ -42,60 +42,73 @@ struct CalculModel {
     }
 
     private var expressionHaveEnoughElement: Bool {
+        // check if the expression has a necessary of minimum 3 operands
         return elements.count >= 3
     }
 
     private var expressionHaveResult: Bool {
-        // cree character "="
+        // create equal character
         let character: Character = Character(Operation.equals.rawValue)
         return text.firstIndex(of: character) != nil
     }
+
     // MARK: - Methods
     mutating func setCalculationText(_ text: String) {
         self.text = text
     }
-    // check if the user choices can end up to a calculation result
+
     func canExpressionHaveResult() -> Bool {
+        // check if the user choices can end up to a calculation result
         if expressionHaveResult || text == "0" {
             return true
         }
         return false
     }
-    // checking if current has a value
+
     mutating private func isCurrentNil() -> Bool {
+        // checking if current has a value
         if current == nil {
             return true
         } else {
             return false
         }
     }
+
     mutating func shouldResetView() -> Bool {
-        // nettoyer current
+        // clean current
         if isCurrentNil() == false {
             resetCurrent()
             return true
         }
-        // nettoyer le text
+        // clean text
         if canExpressionHaveResult() {
             return true
         }
         return false
     }
-    // reset current value to nil
+
     mutating private func resetCurrent() {
+        // checking if user entry can lead to a valid operation
         current = nil
     }
-    // checking if user entry can lead to a valid operation
+
     mutating func canHandleOperation(sign: Operation) throws -> Operation {
+        // checking if user entry can lead to a valid operation
         current = nil
+        if text == "" {
+            throw CalculationError.invalidExpression
+        }
         if expressionIsCorrect == true {
             return sign
         } else {
-            throw CalculationError.invalidExpression
+            throw CalculationError.duplicateOperator
         }
     }
-    // checking for priority calculation in expression
+
+    // MARK: - Operation methods
+
     private func findPriorityIndex(array: [String]) -> Int {
+        // checking for priority calculation in expression
         if let index = array.firstIndex(of: Operation.multiply.rawValue) {
             return index
         } else if let index = array.firstIndex(of: Operation.divide.rawValue) {
@@ -103,15 +116,7 @@ struct CalculModel {
         }
         return -1
     }
-    private func isInteger(_ result: Double) -> Bool {
-        // permet de voir si il y a des chiffres après la virgule (decimal)
-        if result.truncatingRemainder(dividingBy: 1) == 0 {
-            return true
-        } else {
-            return false
-        }
-    }
-    // separation des
+
     func createDoubleElementForOperation(array: [String], index: Int) throws -> Double {
         guard let element = Double(array[index]) else {
             throw CalculationError.invalidExpression
@@ -125,8 +130,8 @@ struct CalculModel {
         return operatorElement
     }
 
-    // method who prepare operation
     mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Double {
+        // method who prepare operation
         do {
             let left = try createDoubleElementForOperation(array: toReduce, index: index - 1)
             let operand = try createOperatorElementForOperation(array: toReduce, index: index)
@@ -141,8 +146,9 @@ struct CalculModel {
             throw CalculationError.divisionByZero
         }
     }
-    // calculation logic
+
     private func doOperation(left: Double, right: Double, sign: Operation) throws -> Double {
+        // calculation logic
         let result: Double
         switch sign {
         case .add: result = left + right
@@ -160,23 +166,6 @@ struct CalculModel {
         return result
     }
 
-    private func transformDoubleResultIntoInteger(_ finalResult: String?) -> String {
-        // unwrapping operationToReduce.firts qui est optionnel
-        // puis unwrappe result qui est un Double optionnel
-        // c'est une succession de if let en condensé, plus facile à lire
-        if let finalResult = finalResult,
-           let result: Double = Double(finalResult) {
-            if isInteger(result) {
-                // transformation du resultat double (ex: 3.0) en entier (3)
-                // transforme notre resultat Int en String en l'inbriquant dans un string
-                return String(format: "%.0f", result)
-            } else {
-                // resultat avec un decimal valide (ex : 3.5)
-                return finalResult
-            }
-        }
-        return ""
-    }
     mutating func equalOperation() throws -> String {
         // checking errors of user entry
         if expressionIsCorrect != true {
@@ -185,20 +174,17 @@ struct CalculModel {
         if expressionHaveEnoughElement != true {
             throw CalculationError.notEnoughElement
         }
-
         var operationsToReduce = elements
         while operationsToReduce.count > 1 {
             // checking if there is a multiply priority in calculation
             let index = findPriorityIndex(array: operationsToReduce)
             if index != -1 {
                 do {
+                    // moving index position of values to prevent calculation error with shifting problem
                     let result = try prepareOperation(toReduce: operationsToReduce, index: index)
                     operationsToReduce.remove(at: index + 1)
                     operationsToReduce.remove(at: index)
                     operationsToReduce.remove(at: index - 1)
-                    // pour gérer les cas où la prio est au milieu d'un calcul
-                    // pour eviter le shift de placement dans l'array, supp par la fin
-                    // et on place le resulat à la place avant la position de l'operator (index)
                     operationsToReduce.insert("\(result)", at: index - 1)
                 } catch {
                     throw CalculationError.divisionByZero
@@ -216,6 +202,33 @@ struct CalculModel {
         let finalResult = transformDoubleResultIntoInteger(operationsToReduce.first)
         return finalResult
     }
+
+    // MARK: - Gestion of Number
+
+    private func isInteger(_ result: Double) -> Bool {
+        // checking if there is integer after decimal)
+        if result.truncatingRemainder(dividingBy: 1) == 0 {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    private func transformDoubleResultIntoInteger(_ finalResult: String?) -> String {
+        if let finalResult = finalResult,
+           let result: Double = Double(finalResult) {
+            if isInteger(result) {
+                // transform decimal result into Int if there is 0 after the floating point
+                return String(format: "%.0f", result)
+            } else {
+                // return decimal result
+                return finalResult
+            }
+        }
+        return ""
+    }
+
+    // MARK: - Clear
     mutating func allClear() {
         self.text = ""
     }

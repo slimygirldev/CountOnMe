@@ -20,7 +20,7 @@ protocol CalculatorViewDelegate: AnyObject {
 }
 
 class CalculatorView: UIView {
-    var delegate: CalculatorViewDelegate?
+    weak var delegate: CalculatorViewDelegate?
 
     @IBOutlet private weak var textView: UITextView!
     @IBOutlet private var numberButtons: [UIButton]!

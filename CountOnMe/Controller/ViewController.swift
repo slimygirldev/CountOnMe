@@ -15,11 +15,12 @@ class ViewController: UIViewController {
     let alertService: AlertProvider = AlertProvider()
     var calculModel: CalculModel = CalculModel()
 
-    // View Life cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         calculatorView.delegate = self
     }
+
+    // MARK: - Operation
 
     func tappedNumberButton(numberBtn: String?) {
         calculModel.setCalculationText(calculatorView.getCaclulatorText())
@@ -37,6 +38,9 @@ class ViewController: UIViewController {
             let operatorSign = try calculModel.canHandleOperation(sign: sign)
             calculatorView.appendCalculatortext(textToAppend: " \(operatorSign.rawValue) ")
         } catch CalculationError.invalidExpression {
+            self.present(alertService.alertError(alertType: .invalidExpression),
+                         animated: true, completion: nil)
+        } catch CalculationError.duplicateOperator {
             self.present(alertService.alertError(alertType: .duplicateOperator),
                          animated: true, completion: nil)
         } catch {
@@ -73,6 +77,9 @@ class ViewController: UIViewController {
     }
 
 }
+
+// MARK: - CalculatorViewDelegate
+
 extension ViewController: CalculatorViewDelegate {
     func calculatorViewDelegateTappedClearButton() {
         tappedClearButton()
@@ -100,6 +107,5 @@ extension ViewController: CalculatorViewDelegate {
 
     func calculatorViewDelegateTappedEqualButton() {
         tappedEqualButton()
-
     }
 }
