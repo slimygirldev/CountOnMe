@@ -30,22 +30,13 @@
       codeCoverageEnabled = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1FA43BE2224E569A00F565CB"
                BuildableName = "CountOnMeTests.xctest"
                BlueprintName = "CountOnMeTests"
-               ReferencedContainer = "container:CountOnMe.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1FA43BED224E569A00F565CB"
-               BuildableName = "CountOnMeUITests.xctest"
-               BlueprintName = "CountOnMeUITests"
                ReferencedContainer = "container:CountOnMe.xcodeproj">
             </BuildableReference>
          </TestableReference>

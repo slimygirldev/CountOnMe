@@ -125,7 +125,7 @@ class SimpleCalcTests: XCTestCase {
 
         let result = try? model.equalOperation()
 
-        XCTAssertTrue(result == "23340818")
+        XCTAssertTrue(result == "2.33408e+07")
     }
 
     func testGivenCalculationWithError_WhenDoOperationFindPriority_ThenCatchInvalideExpression() {
@@ -166,7 +166,7 @@ class SimpleCalcTests: XCTestCase {
 
         let reset = model.shouldResetView()
 
-        XCTAssert(reset == true)
+        XCTAssertTrue(reset)
     }
 
     func testGivenCalculation_WhenSetCalculationTextIsEqual_ThenSuccessResetView() {
@@ -174,7 +174,7 @@ class SimpleCalcTests: XCTestCase {
 
         let reset = model.shouldResetView()
 
-        XCTAssert(reset == true)
+        XCTAssertTrue(reset)
     }
 
     func testGivenCalculation_WhenIsCurrentNotNil_ThenSuccessResetView() {
@@ -183,7 +183,7 @@ class SimpleCalcTests: XCTestCase {
 
         let reset = model.shouldResetView()
 
-        XCTAssert(reset == true)
+        XCTAssertTrue(reset)
     }
 
     func testGivenSetCalculationText_WhenCanHandleOperationIsTrue_ThenExpressionIsCorrect() {
@@ -191,14 +191,14 @@ class SimpleCalcTests: XCTestCase {
 
         let operation = try?  model.canHandleOperation(sign: .add)
 
-        XCTAssert(operation == .add)
+        XCTAssertEqual(operation, .add)
     }
 
     func testGivenExpressionIsNotCorrect_WhenExpressionIsFalse_ThenCatchFailCanHandleOperation() {
         model.setCalculationText("+")
 
         XCTAssertThrowsError(try model.canHandleOperation(sign: .divide)) { error in
-            XCTAssertEqual(error as? CalculationError, CalculationError.invalidExpression)
+            XCTAssertEqual(error as? CalculationError, CalculationError.duplicateOperator)
         }
     }
 
@@ -215,6 +215,6 @@ class SimpleCalcTests: XCTestCase {
 
         let result = model.canExpressionHaveResult()
 
-        XCTAssert(result == false)
+        XCTAssertFalse(result)
     }
 }
