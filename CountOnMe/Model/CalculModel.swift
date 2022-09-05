@@ -23,8 +23,10 @@ enum Operation: String {
     case equals = "="
 }
 
-struct CalculModel {
+class CalculModel {
+
     // MARK: - Properties
+
     private(set) var text: String = ""
     private var current: Double?
     private var asAnOperation: Bool = false
@@ -33,8 +35,9 @@ struct CalculModel {
         return text.split(separator: " ").map { "\($0)" }
     }
 
+
+    /// prevent to enter two operator consecutively
     private var expressionIsCorrect: Bool {
-        // prevent to enter two operator consecutively
         return elements.last != Operation.add.rawValue
         && elements.last != Operation.substract.rawValue
         && elements.last != Operation.divide.rawValue
@@ -42,31 +45,30 @@ struct CalculModel {
     }
 
     private var expressionHaveEnoughElement: Bool {
-        // check if the expression has a necessary of minimum 3 operands
         return elements.count >= 3
     }
 
     private var expressionHaveResult: Bool {
-        // create equal character
         let character: Character = Character(Operation.equals.rawValue)
         return text.firstIndex(of: character) != nil
     }
 
     // MARK: - Methods
-    mutating func setCalculationText(_ text: String) {
+
+    func setCalculationText(_ text: String) {
         self.text = text
     }
 
+    /// check if the user choices can end up to a calculation result
     func canExpressionHaveResult() -> Bool {
-        // check if the user choices can end up to a calculation result
         if expressionHaveResult || text == "0" {
             return true
         }
         return false
     }
 
-    mutating private func isCurrentNil() -> Bool {
-        // checking if current has a value
+    /// checking if current has a value
+    private func isCurrentNil() -> Bool {
         if current == nil {
             return true
         } else {
@@ -74,8 +76,7 @@ struct CalculModel {
         }
     }
 
-    mutating func shouldResetView() -> Bool {
-        // clean current
+    func shouldResetView() -> Bool {
         if isCurrentNil() == false {
             resetCurrent()
             return true
@@ -87,13 +88,13 @@ struct CalculModel {
         return false
     }
 
-    mutating private func resetCurrent() {
-        // checking if user entry can lead to a valid operation
+    /// checking if user entry can lead to a valid operation
+    private func resetCurrent() {
         current = nil
     }
 
-    mutating func canHandleOperation(sign: Operation) throws -> Operation {
-        // checking if user entry can lead to a valid operation
+    /// checking if user entry can lead to a valid operation
+    func canHandleOperation(sign: Operation) throws -> Operation {
         current = nil
         if text == "" {
             throw CalculationError.invalidExpression
@@ -107,11 +108,11 @@ struct CalculModel {
 
     // MARK: - Operation methods
 
+    /// checking for priority calculation in expression
     private func findPriorityIndex(array: [String]) -> Int {
-        // checking for priority calculation in expression
-        if let index = array.firstIndex(of: Operation.multiply.rawValue) {
+        if let index = array.firstIndex(of: Operation.divide.rawValue) {
             return index
-        } else if let index = array.firstIndex(of: Operation.divide.rawValue) {
+        } else if let index = array.firstIndex(of: Operation.multiply.rawValue) {
             return index
         }
         return -1
@@ -123,6 +124,7 @@ struct CalculModel {
         }
         return element
     }
+
     func createOperatorElementForOperation(array: [String], index: Int) throws -> Operation {
         guard let operatorElement = Operation(rawValue: array[index]) else {
             throw CalculationError.invalidExpression
@@ -130,8 +132,8 @@ struct CalculModel {
         return operatorElement
     }
 
-    mutating private func prepareOperation(toReduce: [String], index: Int) throws -> Double {
-        // method who prepare operation
+    ///  method who prepare operation
+    private func prepareOperation(toReduce: [String], index: Int) throws -> Double {
         do {
             let left = try createDoubleElementForOperation(array: toReduce, index: index - 1)
             let operand = try createOperatorElementForOperation(array: toReduce, index: index)
@@ -148,7 +150,6 @@ struct CalculModel {
     }
 
     private func doOperation(left: Double, right: Double, sign: Operation) throws -> Double {
-        // calculation logic
         let result: Double
         switch sign {
         case .add: result = left + right
@@ -166,8 +167,7 @@ struct CalculModel {
         return result
     }
 
-    mutating func equalOperation() throws -> String {
-        // checking errors of user entry
+    func equalOperation() throws -> String {
         if expressionIsCorrect != true {
             throw CalculationError.invalidExpression
         }
@@ -206,7 +206,6 @@ struct CalculModel {
     // MARK: - Gestion of Number
 
     private func isInteger(_ result: Double) -> Bool {
-        // checking if there is integer after decimal)
         if result.truncatingRemainder(dividingBy: 1) == 0 {
             return true
         } else {
@@ -218,8 +217,8 @@ struct CalculModel {
         if let finalResult = finalResult,
            let result: Double = Double(finalResult) {
             if isInteger(result) {
-                // transform decimal result into Int if there is 0 after the floating point
-                return String(format: "%.0f", result)
+                return String(format: "%g", result)
+                // change formatting parameter before : return String(format: "%.0f", result)
             } else {
                 // return decimal result
                 return finalResult
@@ -229,7 +228,7 @@ struct CalculModel {
     }
 
     // MARK: - Clear
-    mutating func allClear() {
+    func allClear() {
         self.text = ""
     }
 }

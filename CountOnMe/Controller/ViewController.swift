@@ -8,12 +8,12 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
 
     @IBOutlet var calculatorView: CalculatorView!
 
-    let alertService: AlertProvider = AlertProvider()
-    var calculModel: CalculModel = CalculModel()
+    private let alertService: AlertProvider = AlertProvider()
+    let calculModel: CalculModel = CalculModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
