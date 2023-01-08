@@ -1,3 +1,5 @@
+<img src="https://user-images.githubusercontent.com/63591976/211213060-0660114d-60b2-4665-8a95-f5be1006ee41.png" alt="drawing" width="65"/>
+
 # CountOnMe
 iOS App - Calculator (MVC  &amp; Unit Test) 
 
@@ -5,7 +7,6 @@ iOS App - Calculator (MVC  &amp; Unit Test)
 ## Description :
 
 This Calculator application was developed as part of the Openclassrooms iOS development training.
-
 
 
 The mission for this project was to improve an application by refactoring existing code.
