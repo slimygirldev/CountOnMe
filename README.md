@@ -2,7 +2,7 @@
 iOS App - Calculator (MVC  &amp; Unit Test) 
 
 
-## Project description :
+## Description :
 
 This Calculator application was developed as part of the Openclassrooms iOS development training.
 
